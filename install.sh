@@ -58,8 +58,9 @@ certbot certonly --apache -d node.kabel6499.de
 
 a2dissite 000-default default-ssl 000-default-le-ssl
 
+cd /etc/apache2/sites-available/pelican.conf
 curl https://raw.githubusercontent.com/kabel6499/pelican/main/pelican.conf
-
+cd /root/
 
 sudo a2ensite pelican.conf
 sudo a2enmod rewrite
