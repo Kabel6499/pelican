@@ -59,8 +59,8 @@ certbot certonly --apache -d node.kabel6499.de
 a2dissite 000-default default-ssl 000-default-le-ssl
 
 cd /etc/apache2/sites-available/pelican.conf
-curl https://raw.githubusercontent.com/kabel6499/pelican/main/pelican.conf
-cd /root/
+wget https://raw.githubusercontent.com/kabel6499/pelican/main/pelican.conf
+cd /var/www/pelican
 
 sudo a2ensite pelican.conf
 sudo a2enmod rewrite
@@ -84,3 +84,4 @@ sudo mkdir -p /etc/pelican /var/run/wings
 sudo curl -L -o /usr/local/bin/wings "https://github.com/pelican-dev/wings/releases/latest/download/wings_linux_$([[ "$(uname -m)" == "x86_64" ]] && echo "amd64" || echo "arm64")"
 sudo chmod u+x /usr/local/bin/wings
 
+echo now visit your-domain.com/installer and configure your Panel
