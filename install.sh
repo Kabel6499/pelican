@@ -84,8 +84,7 @@ EOF
     --non-interactive \
     --agree-tos \
     --redirect \
-    --e
-    mail "$certbot_mail" \
+    --email "$certbot_mail" \
     -d "$panel_domain"
 
     ## Disable Default Site
