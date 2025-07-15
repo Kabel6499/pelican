@@ -46,8 +46,8 @@ A simple Bash script to install the **Pelican Panel** and **Wings**, with suppor
    ```
 2. Go to the directory of the installer and run:
     ```bash
-     chmod 777 installer.sh
-     bash installer.sh
+     chmod 777 install.sh
+     bash install.sh
      ```
 ---
 
