@@ -62,7 +62,7 @@ delete_panel() {
 }
 
 delete_wings() {
-  sudo systemctl disable --now wings
+  systemctl is-enabled wings &>/dev/null && systemctl disable --now wings
   sudo rm -f /etc/systemd/system/wings.service
   sudo rm -f /usr/local/bin/wings
   sudo rm -rf /etc/pelican

@@ -11,7 +11,6 @@ checkbox=,black
 compactbutton=,black
 '
 
-
 IP=""
 DOMAIN=""
 
@@ -28,8 +27,13 @@ error_handler() {
 trap 'error_handler $LINENO' ERR
 set -euo pipefail
 
+detect_os() {
+    source /etc/os-release
+    OS_ID=$ID
+}
+
 get_ip_address() {
-    ip_address=$(curl -s https://ipinfo.io/ip)
+    ip_address=$(curl -s https://ipinfo.io/ip || hostname -I | awk '{print $1}')
 }
 
 SystemUpdate() {
@@ -42,11 +46,19 @@ InstallApache() {
 
 InstallPHP() {
     apt install -y software-properties-common
-    add-apt-repository -y ppa:ondrej/php
-    apt update
-    apt install -y php8.4 php8.4-fpm php8.4-gd php8.4-mysql php8.4-mbstring \
-        php8.4-bcmath php8.4-xml php8.4-curl php8.4-zip php8.4-intl php8.4-sqlite3 \
-        libapache2-mod-php8.4
+
+    if [[ "$OS_ID" == "ubuntu" ]]; then
+        add-apt-repository -y ppa:ondrej/php
+        apt update
+        apt install -y php8.4 php8.4-fpm php8.4-gd php8.4-mysql php8.4-mbstring \
+            php8.4-bcmath php8.4-xml php8.4-curl php8.4-zip php8.4-intl php8.4-sqlite3 \
+            libapache2-mod-php8.4
+    else
+        apt update
+        apt install -y php php-fpm php-gd php-mysql php-mbstring \
+            php-bcmath php-xml php-curl php-zip php-intl php-sqlite3 \
+            libapache2-mod-php
+    fi
 }
 
 OtherDependencies() {
@@ -75,7 +87,7 @@ panel_repo() {
 }
 
 install_certbot() {
-    apt install -y python3-certbot-apache
+    apt install -y certbot python3-certbot-apache
 }
 
 panel_cert() {
@@ -137,15 +149,16 @@ EOF
 
 activate_apache() {
     a2ensite pelican.conf
-    a2enmod ssl rewrite php8.4
+    a2enmod ssl rewrite
+    a2enmod php* || true
     systemctl restart apache2
 }
 
 enable_panel() {
-    systemctl restart apache2
     php artisan p:environment:setup
     chmod -R 755 storage/* bootstrap/cache/
     chown -R www-data:www-data /var/www/pelican
+    systemctl restart apache2
 }
 
 prompt_db_info() {
@@ -186,7 +199,7 @@ whip_node() {
 wings_repo() {
     curl -sSL https://get.docker.com/ | CHANNEL=stable sh
     mkdir -p /etc/pelican /var/run/wings
-    curl -L -o /usr/local/bin/wings "https://github.com/pelican-dev/wings/releases/latest/download/wings_linux_$([[ "$(uname -m)" == "x86_64" ]] && echo "amd64" || echo "arm64")"
+    curl -L -o /usr/local/bin/wings "https://github.com/pelican-dev/wings/releases/latest/download/wings_linux_$([[ \"$(uname -m)\" == \"x86_64\" ]] && echo \"amd64\" || echo \"arm64\")"
     chmod +x /usr/local/bin/wings
 }
 
@@ -220,7 +233,10 @@ after_wings() {
     whiptail --title "Next Steps" --msgbox "Go back to the repository and follow the post-installation steps to finish setup." 12 60
 }
 
-# Start Menu
+# Start Script
+
+detect_os
+
 installation=$(whiptail --title "Installation Type" \
   --menu "What do you want to install?" 15 60 4 \
   "1" "Panel" \
