@@ -1,4 +1,4 @@
-# Pelican Panel Installer (Bash Script)
+# Pelican Panel Installer (Bash Script) 
 
 A simple Bash script to install the **Pelican Panel** and **Wings**, with support for SSL via Certbot, MySQL integration, and automatic Apache configuration.
 
@@ -19,6 +19,9 @@ A simple Bash script to install the **Pelican Panel** and **Wings**, with suppor
 
 - 🌐 **Apache Auto Configuration**  
   Automatically creates a working Apache VirtualHost for your domain.
+### ⭐ Version 2.0: 
+- 👏 **Panel and Wings Deletion and Update Script**  
+  An external script that lets you delete or update your Wings and Panel
 
 ---
 
@@ -70,7 +73,21 @@ sudo wings --debug
 ```bash
 sudo systemctl enable --now wings
 ```
+## 🔃 Update your Panel or Wings
+  Simply run these commands in the Direcory of this Repository to update your Panel or Wings:
 
+  ```bash
+     chmod 777 update.sh
+     bash update.sh
+```
+
+## 🗑️ Update your Panel or Wings
+  Simply run these commands in the Direcory of this Repository to remove your Panel or Wings:
+
+  ```bash
+     chmod 777 delete.sh
+     bash delete.sh
+```
 ## ❓Questions
 ### If you have any further questions create an Issue on this Repository!
 
