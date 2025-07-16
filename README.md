@@ -19,10 +19,14 @@ A simple Bash script to install the **Pelican Panel** and **Wings**, with suppor
 
 - 🌐 **Apache Auto Configuration**  
   Automatically creates a working Apache VirtualHost for your domain.
-### ⭐ Version 2.0: 
+
 - 👏 **Panel and Wings Deletion and Update Script**  
   An external script that lets you delete or update your Wings and Panel
+---
+### ⭐ Version 3.0: 
 
+- 👏 **Panel and Wings Deletion and Update Script**  
+   This Script now Supports http that means you dont need a domain to install your panel. Just ste your IP as Node and you're ready to go.
 ---
 
 ## 📦 Requirements
@@ -31,8 +35,12 @@ A simple Bash script to install the **Pelican Panel** and **Wings**, with suppor
 | Distribution       | Recommended Version(s) | Support Status | Notes                            |
 |--------------------|------------------------|----------------|----------------------------------|
 | **Ubuntu**         | 24.04/24.10        | ✅ Supported    | Fully tested                     |
-| **Debian**         | 11, 12                  | ❌ Not Supported yet    | Soon        |
+| **Debian**         | 11, 12                  | 🟡 limited support    | There could be an issue with PHP       |
 |||||
+
+Issue will be fixed soon!
+
+
 
 
 ## Other Requirements

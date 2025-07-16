@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# Farben für whiptail (optional)
 export NEWT_COLORS='
 root=,blue
 window=,black
@@ -10,6 +11,20 @@ entry=,black
 checkbox=,black
 compactbutton=,black
 '
+
+
+error_handler() {
+    local exit_code=$?
+    local line_number=$1
+    local last_command="${BASH_COMMAND}"
+
+    local msg=$(printf "Error in Line %s:\n\n%s\n\nExit-Code: %s" "$line_number" "$last_command" "$exit_code")
+    whiptail --title "Error" --msgbox "$msg\nIf you dont know how to fix issue report it on the repository." 15 70
+    exit "$exit_code"
+}
+
+set -euo pipefail
+trap 'error_handler $LINENO' ERR
 
 delete_panel_mysql() {
   whiptail --title "DB Deletion" --yesno "Do you want to delete your Panel DB?" 10 60
