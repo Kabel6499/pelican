@@ -184,9 +184,9 @@ whip_panel() {
     if [ "$DOMAIN" = "YES" ]; then
         panel_domain=$(whiptail --title "Panel Domain" --inputbox "What is your Panel Domain?" 10 60 3>&1 1>&2 2>&3)
         certbot_mail=$(whiptail --title "Certbot Email" --inputbox "Enter your Email address:" 10 60 3>&1 1>&2 2>&3)
+        prompt_db_info
+        whiptail --title "Overview" --msgbox "Domain: $panel_domain\nDB: $pelican_db\nUser: $panel_db_user" 12 60
     fi
-    prompt_db_info
-    whiptail --title "Overview" --msgbox "Domain: $panel_domain\nDB: $pelican_db\nUser: $panel_db_user" 12 60
 }
 
 whip_node() {
