@@ -25,16 +25,16 @@ A simple Bash script to install the **Pelican Panel** and **Wings**, with suppor
 ---
 ### ⭐ Version 3.0: 
 
-- 👏 **Panel and Wings Deletion and Update Script**  
+- 💻 **HTTP Support - use your Server-IP as Panel and Node Domain**  
    This Script now Supports http that means you dont need a domain to install your panel. Just set your IP as Node and you're ready to go.
 
 ### ⭐ Version 4.0: 
 
-- 👏 **Update Installation Scirpt to newer Version of Panel**  
+- 🐞 **Update Installation Scirpt to newer Version of Panel**  
    Updated Installation script to match with newer versions.
 
-- 👏 **Updated Installation Guides for Panel and Node** 
-   Updated Installation Guides to setup the panel and node
+- 🏁 **Updated Installation Guides for Panel and Node**  
+   Updated Installation Guides to setup the panel and node.
 ---
 
 ## 📦 Requirements
