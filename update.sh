@@ -26,6 +26,18 @@ error_handler() {
 set -euo pipefail
 trap 'error_handler $LINENO' ERR
 
+detect_os() {
+    source /etc/os-release
+    OS_ID=$ID
+}
+
+detect_os
+
+if [[ "$OS_ID" == "debian" ]]; then
+    whiptail --title "Unsupported OS" --msgbox "Debian is not supported by this script.\n\nPlease use Ubuntu 24.04 or newer." 12 60
+    exit 1
+fi
+
 update_panel() {
   cd /var/www/pelican || {
     whiptail --title "Error" --msgbox "Directory /var/www/pelican not found" 10 60
@@ -64,7 +76,7 @@ installation=$(whiptail --title "Update Pelican" \
 case "$installation" in
   1)
     update_panel
-    whiptail --title "Panel updated" --msgbox "Your Panel is now succsesfully updated. Have fun" 12 60
+    whiptail --title "Panel updated" --msgbox "Your Panel is now succsesfully updated. Have fun!" 12 60
     ;;
   2)
     update_wings
@@ -73,6 +85,6 @@ case "$installation" in
   3)
     update_panel
     update_wings
-    whiptail --title "Update completed" --msgbox "Your Panel and Wings were succsesfully updated! Have Fun!" 12 60
+    whiptail --title "Update completed" --msgbox "Your Panel and Wings were succsesfully updated! Have fun!" 12 60
     ;;
 esac

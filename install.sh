@@ -13,6 +13,7 @@ compactbutton=,black
 
 IP=""
 DOMAIN=""
+PHP_MOD=""
 
 error_handler() {
     local exit_code=$?
@@ -46,18 +47,21 @@ InstallApache() {
 
 InstallPHP() {
     apt install -y software-properties-common
-
-    if [[ "$OS_ID" == "ubuntu" ]]; then
+    CODENAME=$(lsb_release -cs)
+    PPA_URL="https://ppa.launchpadcontent.net/ondrej/php/ubuntu/dists/$CODENAME/Release"
+    if curl --silent --head "$PPA_URL" | grep -q "200 OK"; then
         add-apt-repository -y ppa:ondrej/php
         apt update
         apt install -y php8.4 php8.4-fpm php8.4-gd php8.4-mysql php8.4-mbstring \
             php8.4-bcmath php8.4-xml php8.4-curl php8.4-zip php8.4-intl php8.4-sqlite3 \
             libapache2-mod-php8.4
+        PHP_MOD="php8.4"
     else
         apt update
         apt install -y php php-fpm php-gd php-mysql php-mbstring \
             php-bcmath php-xml php-curl php-zip php-intl php-sqlite3 \
             libapache2-mod-php
+        PHP_MOD="php$(php -r 'echo PHP_MAJOR_VERSION.".".PHP_MINOR_VERSION;')"
     fi
 }
 
@@ -69,7 +73,6 @@ InstallMySQL() {
     echo "mysql-server mysql-server/root_password password $root_pw" | debconf-set-selections
     echo "mysql-server mysql-server/root_password_again password $root_pw" | debconf-set-selections
     apt install -y mysql-server
-
     mysql -u root -p"$root_pw" <<EOF
 CREATE DATABASE IF NOT EXISTS $pelican_db;
 CREATE USER IF NOT EXISTS '$panel_db_user'@'localhost' IDENTIFIED BY '$panel_pw';
@@ -95,7 +98,11 @@ panel_cert() {
 }
 
 node_cert() {
-    certbot --apache --non-interactive --agree-tos --redirect --email "$certbot_mail" -d "$node_domain"
+    if systemctl is-active --quiet apache2; then
+        certbot certonly --authenticator apache --installer none --non-interactive --agree-tos --email "$certbot_mail" -d "$node_domain"
+    else
+        certbot certonly --standalone --non-interactive --agree-tos --email "$certbot_mail" -d "$node_domain"
+    fi
 }
 
 apache_config() {
@@ -150,7 +157,7 @@ EOF
 activate_apache() {
     a2ensite pelican.conf
     a2enmod ssl rewrite
-    a2enmod php* || true
+    a2enmod "$PHP_MOD"
     systemctl restart apache2
 }
 
@@ -189,11 +196,28 @@ whip_panel() {
     fi
 }
 
+whip_both() {
+    if [ "$DOMAIN" = "YES" ]; then
+        panel_domain=$(whiptail --title "Panel Domain" --inputbox "What is your Panel Domain?" 10 60 3>&1 1>&2 2>&3)
+        certbot_mail=$(whiptail --title "Certbot Email" --inputbox "Enter your Email address:" 10 60 3>&1 1>&2 2>&3)
+        node_domain=$(whiptail --title "Node Domain" --inputbox "Enter your Node Domain:" 10 60 3>&1 1>&2 2>&3)
+        prompt_db_info
+        whiptail --title "Overview" --msgbox "Domain: $panel_domain\nnode_domain: $node_domain\ncertbot-mail: $certbot_mail\nDB: $pelican_db\nUser: $panel_db_user" 12 60
+    fi
+}
+
 whip_node() {
     if [ "$DOMAIN" = "YES" ]; then
         node_domain=$(whiptail --title "Node Domain" --inputbox "Enter your Node Domain:" 10 60 3>&1 1>&2 2>&3)
         certbot_mail=$(whiptail --title "Certbot Email" --inputbox "Enter your Email address:" 10 60 3>&1 1>&2 2>&3)
     fi
+}
+
+wings_repo() {
+    curl -sSL https://get.docker.com/ | CHANNEL=stable sh
+    mkdir -p /etc/pelican /var/run/wings
+    curl -L -o /usr/local/bin/wings "https://github.com/pelican-dev/wings/releases/latest/download/wings_linux_$([[ \"$(uname -m)\" == \"x86_64\" ]] && echo \"amd64\" || echo \"arm64\")"
+    chmod +x /usr/local/bin/wings
 }
 
 wings_repo() {
@@ -237,6 +261,11 @@ after_wings() {
 
 detect_os
 
+if [[ "$OS_ID" == "debian" ]]; then
+    whiptail --title "Unsupported OS" --msgbox "Debian is not supported by this installer.\n\nPlease use Ubuntu 24.04 or newer." 12 60
+    exit 1
+fi
+
 installation=$(whiptail --title "Installation Type" \
   --menu "What do you want to install?" 15 60 4 \
   "1" "Panel" \
@@ -255,6 +284,9 @@ case "$installation" in
     InstallMySQL
     panel_repo
     install_certbot
+    if [ "$DOMAIN" = "YES" ]; then
+        panel_cert
+    fi
     apache_config
     activate_apache
     enable_panel
@@ -268,8 +300,7 @@ case "$installation" in
     ;;
   3)
     whip_http
-    whip_panel
-    whip_node
+    whip_both
     SystemUpdate
     InstallApache
     InstallPHP
@@ -277,6 +308,9 @@ case "$installation" in
     InstallMySQL
     panel_repo
     install_certbot
+    if [ "$DOMAIN" = "YES" ]; then
+        panel_cert
+    fi
     apache_config
     activate_apache
     enable_panel

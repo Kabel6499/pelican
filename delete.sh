@@ -26,6 +26,18 @@ error_handler() {
 set -euo pipefail
 trap 'error_handler $LINENO' ERR
 
+detect_os() {
+    source /etc/os-release
+    OS_ID=$ID
+}
+
+detect_os
+
+if [[ "$OS_ID" == "debian" ]]; then
+    whiptail --title "Unsupported OS" --msgbox "Debian is not supported by this script.\n\nPlease use Ubuntu 24.04 or newer." 12 60
+    exit 1
+fi
+
 delete_panel_mysql() {
   whiptail --title "DB Deletion" --yesno "Do you want to delete your Panel DB?" 10 60
 
