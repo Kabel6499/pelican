@@ -220,13 +220,6 @@ wings_repo() {
     chmod +x /usr/local/bin/wings
 }
 
-wings_repo() {
-    curl -sSL https://get.docker.com/ | CHANNEL=stable sh
-    mkdir -p /etc/pelican /var/run/wings
-    curl -L -o /usr/local/bin/wings "https://github.com/pelican-dev/wings/releases/latest/download/wings_linux_$([[ \"$(uname -m)\" == \"x86_64\" ]] && echo \"amd64\" || echo \"arm64\")"
-    chmod +x /usr/local/bin/wings
-}
-
 systemcd_config() {
     cat <<EOF > /etc/systemd/system/wings.service
 [Unit]
